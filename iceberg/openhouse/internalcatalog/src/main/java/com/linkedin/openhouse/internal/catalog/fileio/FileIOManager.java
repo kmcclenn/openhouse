@@ -1,10 +1,10 @@
 package com.linkedin.openhouse.internal.catalog.fileio;
 
-import static com.linkedin.openhouse.cluster.storage.StorageType.HDFS;
-import static com.linkedin.openhouse.cluster.storage.StorageType.LOCAL;
+import static com.linkedin.openhouse.cluster.storage.StorageType.*;
 
 import com.linkedin.openhouse.cluster.storage.Storage;
 import com.linkedin.openhouse.cluster.storage.StorageType;
+import com.linkedin.openhouse.cluster.storage.adls.ADLSStorage;
 import com.linkedin.openhouse.cluster.storage.hdfs.HdfsStorage;
 import com.linkedin.openhouse.cluster.storage.local.LocalStorage;
 import java.util.Optional;
@@ -33,9 +33,15 @@ public class FileIOManager {
   @Qualifier("LocalFileIO")
   FileIO localFileIO;
 
+  @Autowired(required = false) // doesn't inject if null
+  @Qualifier("ADLSFileIO") // avoid ambiguity with multiple beans of the same type
+  FileIO adlsFileIO;
+
   @Autowired HdfsStorage hdfsStorage;
 
   @Autowired LocalStorage localStorage;
+
+  @Autowired ADLSStorage adlsStorage;
   /**
    * Returns the FileIO implementation for the given storage type.
    *
@@ -50,6 +56,9 @@ public class FileIOManager {
       return Optional.ofNullable(hdfsFileIO).orElseThrow(exceptionSupplier);
     } else if (LOCAL.equals(storageType)) {
       return Optional.ofNullable(localFileIO).orElseThrow(exceptionSupplier);
+    } else if (ADLS.equals(storageType)) {
+      return Optional.ofNullable(adlsFileIO)
+          .orElseThrow(exceptionSupplier); // gets the type, otherwise throws if null
     } else {
       throw new IllegalArgumentException("FileIO not supported for storage type: " + storageType);
     }
@@ -67,6 +76,8 @@ public class FileIOManager {
       return hdfsStorage;
     } else if (fileIO.equals(localFileIO)) {
       return localStorage;
+    } else if (fileIO.equals(adlsFileIO)) {
+      return adlsStorage;
     } else {
       throw new IllegalArgumentException("Storage not supported for fileIO: " + fileIO);
     }
