@@ -3,7 +3,7 @@
     <img src="docs/images/openhouse-logo.jpeg" alt="OpenHouse" width="400" height="300">
   </div>
 </html>
-
+ 
 Use this guide to setup local development environment for OpenHouse using docker-compose.
 
 ## Build Containers
