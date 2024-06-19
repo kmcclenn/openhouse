@@ -1,8 +1,8 @@
 package com.linkedin.openhouse.internal.catalog.fileio;
 
-import com.azure.storage.file.datalake.DataLakeFileClient;
 import com.linkedin.openhouse.cluster.storage.StorageManager;
 import com.linkedin.openhouse.cluster.storage.StorageType;
+import com.linkedin.openhouse.cluster.storage.adls.AdlsStorageClient;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.iceberg.aws.s3.S3FileIO;
@@ -90,25 +90,24 @@ public class FileIOConfig {
       // S3 storage configured but could not instantiate S3FileIO.
       throw new IllegalArgumentException(
           "S3 storage configured but could not initialize S3FileIO" + e.getMessage());
+    }
+  }
 
   /**
    * Provides the ADLSFileIO bean for ADLS storage type
    *
    * @return ADLSFileIO bean for ADLS storage type, or null if ADLS storage type is not configured
    */
-  @Bean("ADLSFileIO")
+  @Bean
   ADLSFileIO provideADLSFileIO() {
-
     try {
-      DataLakeFileClient dataLake =
-          storageManager.getStorage(StorageType.ADLS).getClient().getNativeClient();
-      ADLSFileIO fileIO = new ADLSFileIO();
-      fileIO.initialize(dataLake.getProperties());
+      // get the already-created FileIO from the ADLS Manager
+      ADLSFileIO fileIO =
+          ((AdlsStorageClient) storageManager.getStorage(StorageType.ADLS).getClient()).getFileIO();
       return fileIO;
     } catch (IllegalArgumentException e) {
       // If the ADLS storage type is not configured, return null
       // Spring doesn't define the bean if the return value is null
-      log.debug("ADLS storage type is not configured", e);
       return null;
     }
   }
