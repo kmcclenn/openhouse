@@ -9,5 +9,6 @@ plugins {
 
 dependencies {
   implementation project(':cluster:configs')
+  implementation project(':iceberg:azure')
   implementation 'org.springframework.boot:spring-boot-autoconfigure:' + spring_web_version
 }
