@@ -28,8 +28,18 @@ module "k8s" {
   vm_size = "Standard_D2s_v3"
 }
 
+resource "random_string" "storage_name" {
+    length = 5
+    special = false
+}
+
 module "storage" {
     source = "../../modules/storage"
-    storage_account_name = "openhousestorage729387" // added random string of numbers to make it unique
+    storage_account_name = "openhousestorage${random_string.storage_name.result}" // added random string of numbers to make it unique
     resource_group_name = azurerm_resource_group.openhouse_sandbox.name
+}
+
+module "helm_release" {
+    source = "../../modules/helm_release"
+    depends_on = [ module.k8s ] // so k8s cluster is instantiated before helm deployment
 }
