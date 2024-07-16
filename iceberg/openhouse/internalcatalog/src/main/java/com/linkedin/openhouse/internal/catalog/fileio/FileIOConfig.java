@@ -91,4 +91,23 @@ public class FileIOConfig {
           "S3 storage configured but could not initialize S3FileIO" + e.getMessage());
     }
   }
+
+  /**
+   * Provides the ADLSFileIO bean for ADLS storage type
+   *
+   * @return ADLSFileIO bean for ADLS storage type, or null if ADLS storage type is not configured
+   */
+  @Bean
+  ADLSFileIO provideADLSFileIO() {
+    try {
+      // get the already-created FileIO from the ADLS Manager
+      ADLSFileIO fileIO =
+          ((AdlsStorageClient) storageManager.getStorage(StorageType.ADLS).getClient()).getFileIO();
+      return fileIO;
+    } catch (IllegalArgumentException e) {
+      // If the ADLS storage type is not configured, return null
+      // Spring doesn't define the bean if the return value is null
+      return null;
+    }
+  }
 }
