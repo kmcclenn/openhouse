@@ -2,9 +2,8 @@ resource "helm_release" "tables" {
   chart = "tables"
   name = "openhouse-tables-service"
   repository = "../../../../k8s/helm"
-  namespace = "application"
 
-  values = ["${file("../../../../k8s/environments/asure/sandbox/tables/values.yaml")}"]
+  values = ["${file("../../../../k8s/environments/azure/sandbox/tables/values.yaml")}"]
 
   set {
     name = "storageProperties.containerName"
