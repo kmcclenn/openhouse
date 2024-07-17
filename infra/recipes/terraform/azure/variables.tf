@@ -13,4 +13,5 @@ variable "resource_group_location" {
 variable "k8s_cluster_name" {
     type = string
     description = "The name of the Azure k8s cluster."
+    default = "openhouse_cluster"
 }
